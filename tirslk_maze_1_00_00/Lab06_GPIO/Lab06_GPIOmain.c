@@ -83,6 +83,14 @@ int main(void){
   Reflectance_Init(); // your initialization
   while(1){
     Data = Reflectance_Read(1000); // your measurement
+    P2->OUT &= 0b1111000;
+    if (Data & 0b1100000)
+        P2->OUT |= 0x04;
+    if (Data & 0b0011100)
+        P2->OUT |= 0x02;
+    if(Data & 0b0000011)
+        P2->OUT |= 0x01;
+
     // turn on LED2.RGB as described in the comments
     // write this code
 
