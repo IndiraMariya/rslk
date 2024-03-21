@@ -141,16 +141,19 @@ uint8_t Reflectance_Read(uint32_t time){
 // Assumes: Reflectance_Init() has been called
 uint8_t Reflectance_Center(uint32_t time){
     // write this as part of Lab 6
-    P5->OUT |= 0b0001000;
-    P7->OUT |= 0b1111111;
-    P7->DIR = 0b1111111;
+    P5->OUT |= 0b00001000;
+    P7->OUT = 0b11111111;
 
+    P7->DIR = 0b11111111;
+    Clock_Delay1us(10);
+    P7->DIR = 0;
     Clock_Delay1us(time);
-    uint8_t sen = P7->IN & 0b0011000;
-    P5->OUT &=0b1110111;
+
+    uint8_t sen = P7->IN;
+    sen &= 0b00011000;
+
+    P5->OUT &=0b11110111;
     int val = sen >> 3;
-
-
   return val;
 }
 

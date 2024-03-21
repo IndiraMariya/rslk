@@ -99,6 +99,24 @@ int main(void){
   }
 }
 
+int main_noInt(void){
+  Clock_Init48MHz();
+  Debug_LED_Init();
+  Reflectance_Init(); // your initialization
+  while(1){
+    Data = Reflectance_Read(1000); // your measurement
+    P2->OUT &= 0b1111000;
+    if (Data & 0b1100000)
+        P2->OUT |= 0x04;
+    if (Data & 0b0011100)
+        P2->OUT |= 0x02;
+    if(Data & 0b0000011)
+        P2->OUT |= 0x01;
+
+    Clock_Delay1ms(10);
+  }
+}
+
 int32_t Position; // 332 is right, and -332 is left of center
 int main1(void){
   Clock_Init48MHz();

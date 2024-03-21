@@ -53,9 +53,16 @@ policies, either expressed or implied, of the FreeBSD Project.
 struct State {
   uint32_t out;                // 2-bit output
   uint32_t delay;              // time to delay in 1ms
+  uint8_t LED1;
+  uint8_t LED2;
   const struct State *next[4]; // Next if 2-bit input is 0-3
+
 };
 typedef const struct State State_t;
+
+#define BLUE 0x04
+#define GREEN 0x02
+#define RED 0x01
 
 // Create User-Friendly ways to reference the FSM states
 #define Center       &fsm[0]
@@ -72,17 +79,15 @@ typedef const struct State State_t;
 // Center      Both     500     RightOff1  LeftOff1   RightOff1  Center
 
 State_t fsm[9]={
-  {0x03, 500,  { RightOff1, LeftOff1,   RightOff1,  Center }}, // Center
-/* TODO: fill in the rest of the states
-  {0x02, 500,  { , , , }},  // LeftOff1
-  {0x03, 500,  { , , , }},  // LeftOff2
-  {0x01, 500,  { , , , }},  // RightOff1
-  {0x03, 500,  { , , , }},  // RightOff2
-  {0x02, 5000, { , , , }},  // LostLeft
-  {0x01, 5000, { , , , }},  // LostRight
-  {0x03, 5000, { , , , }},  // Fwd5
-  {0x00, 500,  { , , , }},  // Stop
-*/
+  {0x03, 500,  0, GREEN,{ RightOff1, LeftOff1,   RightOff1,  Center }}, // Center
+  {0x02, 500,  0, BLUE,{LostLeft, LeftOff2, RightOff1,Center }},  // LeftOff1
+  {0x03, 500,  1, BLUE,{LostLeft, LeftOff1, RightOff1, Center}},  // LeftOff2
+  {0x01, 500,  0, RED,{LostRight, LeftOff1, RightOff2,Center }},  // RightOff1
+  {0x03, 500,  1, RED,{LostRight, LeftOff1, RightOff1,Center }},  // RightOff2
+  {0x02, 5000, 0, GREEN+BLUE,{Fwd5, Fwd5, Fwd5, Fwd5}},  // LostLeft
+  {0x01, 5000, 0, GREEN+RED,{Fwd5, Fwd5, Fwd5, Fwd5}},  // LostRight
+  {0x03, 5000, 0, GREEN+BLUE+RED,{Stop, LeftOff1, RightOff1, Center}},  // Fwd5
+  {0x00, 500,  1, 0x00,{Stop, LeftOff1, RightOff1, Center}},  // Stop
 };
 
 
@@ -101,8 +106,9 @@ int main(void){
   Spt = Center;
   while(1){
     Output = Spt->out;            // set output from FSM
-    LaunchPad_LED(0x0);     // display state information per slides
-    LaunchPad_Output(0x0);
+    LaunchPad_LED(Spt->LED1);     // display state information per slides
+    LaunchPad_Output(Spt->LED2);
+
     Clock_Delay1ms(Spt->delay);   // wait
     //Input = LaunchPad_Input();    // read sensors
     Input = Reflectance_Center(1000);
