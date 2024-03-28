@@ -175,7 +175,12 @@ int32_t Reflectance_Position(uint8_t data){
 // Output: none
 // Assumes: Reflectance_Init() has been called
 void Reflectance_Start(void){
-    // write this as part of Lab 10
+    P5->OUT &= 0b1110111;
+    P5->OUT |= 0b0001000;
+
+    P7->DIR |= 0b1111111;
+    Clock_Delay1us(10);
+    P7->DIR = 0;
 }
 
 
@@ -188,7 +193,9 @@ void Reflectance_Start(void){
 // Assumes: Reflectance_Init() has been called
 // Assumes: Reflectance_Start() was called 1 ms ago
 uint8_t Reflectance_End(void){
-    // write this as part of Lab 10
- return 0; // replace this line
+    uint8_t sen = P7->IN;
+    sen &= 0b00011000;
+    P5->OUT &=0b11110111;
+    return sen;
 }
 

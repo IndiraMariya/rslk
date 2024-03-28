@@ -58,8 +58,15 @@ policies, either expressed or implied, of the FreeBSD Project.
 #include "msp.h"
 #include "../inc/Reflectance.h"
 #include "../inc/Clock.h"
+#include "../inc/CortexM.h"
+#include "../inc/LaunchPad.h"
+#include "../inc/SysTickInts.h"
 
 uint8_t Data; // QTR-8RC
+uint8_t data;
+uint8_t dataValid;
+int msCnt;
+
 
 void Debug_LED_Init() {
     //P2.5 is for driving an oscilloscope to reflect either P5.3 or P7.3
@@ -71,6 +78,20 @@ void Debug_LED_Init() {
     P2->DS |= 0x07;
 }
 
+void SysTick_Handler(void){ // every 1ms
+    if (mScnt == 0) {
+        Reflectance_Start();
+    }
+
+    else if (mScnt == 1) {
+        data = Reflectance_End();
+        dataValid = 1;
+        mScnt++;
+        if (mScnt == 10)
+            mScnt = 0;
+    }
+}
+
 // Test main for part1
 // 1. Initialize the robot
 // 2. Every 10mS, read the line sensor and store the result in Data
@@ -78,23 +99,25 @@ void Debug_LED_Init() {
 //    - if b5, b4, b3, or b2 of Data are set, turn on LED2.GREEN
 //    - if b1 or b0 of Data are set, turn on LED2.RED
 int main(void){
-  Clock_Init48MHz();
-  Debug_LED_Init();
-  Reflectance_Init(); // your initialization
-  while(1){
-    Data = Reflectance_Read(1000); // your measurement
-    P2->OUT &= 0b1111000;
-    if (Data & 0b1100000)
-        P2->OUT |= 0x04;
-    if (Data & 0b0011100)
-        P2->OUT |= 0x02;
-    if(Data & 0b0000011)
-        P2->OUT |= 0x01;
+    Clock_Init48MHz();
+    Debug_LED_Init();
+    Reflectance_Init(); // your initialization
 
-    // turn on LED2.RGB as described in the comments
-    // write this code
+    sysTickInts_Init (47999,1);
+    EnableInterrupts();
 
-
+    while(1){
+    if (dataValid){
+        Data = Reflectance_Read(1000);
+        P2->OUT &= 0b1111000;
+        if (Data & 0b1100000)
+            P2->OUT |= 0x04;
+        if (Data & 0b0011100)
+            P2->OUT |= 0x02;
+        if(Data & 0b0000011)
+            P2->OUT |= 0x01;
+        dataValid = 0;
+    }
     Clock_Delay1ms(10);
   }
 }
