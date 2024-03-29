@@ -108,17 +108,16 @@ int main(void){
 
     while(1){
     if (dataValid){
-        Data = Reflectance_Read(1000);
         P2->OUT &= 0b1111000;
-        if (Data & 0b1100000)
+        if (data & 0b1100000)
             P2->OUT |= 0x04;
-        if (Data & 0b0011100)
+        if (data & 0b0011100)
             P2->OUT |= 0x02;
-        if(Data & 0b0000011)
+        if(data & 0b0000011)
             P2->OUT |= 0x01;
         dataValid = 0;
     }
-    Clock_Delay1ms(10);
+    SysTick_Handler();
   }
 }
 
