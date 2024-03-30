@@ -79,16 +79,16 @@ void Debug_LED_Init() {
 }
 
 void SysTick_Handler(void){ // every 1ms
-    if (mScnt == 0) {
+    if (msCnt == 0) {
         Reflectance_Start();
     }
 
-    else if (mScnt == 1) {
+    else if (msCnt == 1) {
         data = Reflectance_End();
         dataValid = 1;
-        mScnt++;
-        if (mScnt == 10)
-            mScnt = 0;
+        msCnt++;
+        if (msCnt == 10)
+            msCnt = 0;
     }
 }
 
