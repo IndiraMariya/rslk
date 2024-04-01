@@ -65,7 +65,7 @@ policies, either expressed or implied, of the FreeBSD Project.
 uint8_t Data; // QTR-8RC
 uint8_t data;
 uint8_t dataValid;
-int msCnt;
+int msCnt = 0;
 
 
 void Debug_LED_Init() {
@@ -103,7 +103,7 @@ int main(void){
     Debug_LED_Init();
     Reflectance_Init(); // your initialization
 
-    sysTickInts_Init (47999,1);
+    SysTickInts_Init (47999,1);
     EnableInterrupts();
 
     while(1){
