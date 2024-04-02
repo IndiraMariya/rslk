@@ -103,21 +103,21 @@ int main(void){
     Debug_LED_Init();
     Reflectance_Init(); // your initialization
 
-    SysTickInts_Init (47999,1);
+    SysTickInts_Init(47999,1);
     EnableInterrupts();
 
     while(1){
     if (dataValid){
-        P2->OUT &= 0b1111000;
-        if (data & 0b1100000)
+        Data = data;
+        P2->OUT &= 0b11111000;
+        if (Data & 0b11000000)
             P2->OUT |= 0x04;
-        if (data & 0b0011100)
+        if (Data & 0b00111100)
             P2->OUT |= 0x02;
-        if(data & 0b0000011)
+        if(Data & 0b00000011)
             P2->OUT |= 0x01;
         dataValid = 0;
     }
-    SysTick_Handler();
   }
 }
 
