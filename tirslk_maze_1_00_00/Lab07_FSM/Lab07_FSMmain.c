@@ -55,15 +55,17 @@ policies, either expressed or implied, of the FreeBSD Project.
 
 // Linked data structure
 struct State {
-  uint32_t out;                // 2-bit output
-  uint32_t delay;              // time to delay in 1ms
+  uint32_t pwmLeft;
+  uint32_t pwmRight;
   uint8_t LED1;
   uint8_t LED2;
+  uint32_t delay;              // time to delay in 1ms
   const struct State *next[4]; // Next if 2-bit input is 0-3
 
 };
 typedef const struct State State_t;
 
+#define Full_Stop &fsm[9]
 #define BLUE 0x04
 #define GREEN 0x02
 #define RED 0x01
@@ -82,8 +84,8 @@ typedef const struct State State_t;
 // State       Output   Delay   Next_0     Next_1     Next_2     Next_3
 // Center      Both     500     RightOff1  LeftOff1   RightOff1  Center
 
-State_t fsm[9]={
-  {0x03, 500,  0, GREEN,{ RightOff1, LeftOff1,   RightOff1,  Center }}, // Center
+State_t fsm[10]={
+  {1000, 1000, 0, 2 , 5, { RightOff1, LeftOff1,   RightOff1,  Center }}, // Center
   {0x02, 500,  0, BLUE,{LostLeft, LeftOff2, RightOff1,Center }},  // LeftOff1
   {0x03, 500,  1, BLUE,{LostLeft, LeftOff1, RightOff1, Center}},  // LeftOff2
   {0x01, 500,  0, RED,{LostRight, LeftOff1, RightOff2,Center }},  // RightOff1
